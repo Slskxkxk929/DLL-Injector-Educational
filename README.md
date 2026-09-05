@@ -6,6 +6,7 @@ Simple DLL injector for Windows. Educational purpose only.
 This is a simple open-source injector. You can use it, but keep the most important thing in mind:
 
 🚩Under no circumstances should you use the injector for other people's games, projects, or anything else for which you do not have permission.
+
 🚩If you decide to use the code for my injector, please include a note stating that I am the author.
 
 ## Features
