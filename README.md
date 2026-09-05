@@ -25,3 +25,12 @@ This is a simple open-source injector. You can use it, but keep the most importa
 This project is for educational purposes only.
 
 Thanks for understanding!😊
+
+
+
+## v2.0 Changelog
+- Added user input for process name
+- Added user input for DLL path
+- Added step-by-step status messages
+- Improved error handling
+- Console wait before exit
