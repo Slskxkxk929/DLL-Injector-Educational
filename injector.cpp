@@ -1,9 +1,9 @@
-#include <iostream>
-#include <string>
+#include <iostream>   // –î–ª—è –≤—ã–≤–æ–¥–∞ –≤ –∫–æ–Ω—Å–æ–ª—å
+#include <string>     // –î–ª—è std::string
+#include <Windows.h>  // WinAPI
+#include <TlHelp32.h> // –î–ª—è —Å–Ω–∞–ø—à–æ—Ç–æ–≤ –ø—Ä–æ—Ü–µ—Å—Å–æ–≤
 
-#include <Windows.h>
-#include <TlHelp32.h>
-
+// –§—É–Ω–∫—Ü–∏—è: –Ω–∞–π—Ç–∏ PID –ø—Ä–æ—Ü–µ—Å—Å–∞ –ø–æ –∏–º–µ–Ω–∏
 DWORD GetProcessIdByName(const wchar_t* processName) {
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (snapshot == INVALID_HANDLE_VALUE) return 0;
@@ -27,47 +27,80 @@ DWORD GetProcessIdByName(const wchar_t* processName) {
 }
 
 int main() {
+	std::string process;
 
-	DWORD pid = GetProcessIdByName(L"notepad.exe");
+	std::cout << "–í–≤–µ–¥–∏ –∏–º—è –ø—Ä–æ—Ü–µ—Å—Å–∞ (–î–∏—Å–ø–µ—Ç—á–µ—Ä –∑–∞–¥–∞—á -> –ü–æ–¥—Ä–æ–±–Ω–æ—Å—Ç–∏) >> ";
+	std::cin >> process;
+	std::cout << std::endl;
+
+	std::wstring wprocess(process.begin(), process.end());
+
+	std::cout << " –ü–æ–ª—É—á–∞—é PID –ø—Ä–æ—Ü–µ—Å—Å–∞... (1/6)" << std::endl;
+
+	DWORD pid = GetProcessIdByName(wprocess.c_str());
 
 	if (pid == 0) {
-		std::cout << "œÓˆÂÒÒ ÌÂ Ì‡È‰ÂÌ." << std::endl;
+		std::cout << "–ü—Ä–æ—Ü–µ—Å—Å –Ω–µ –Ω–∞–π–¥–µ–Ω." << std::endl;
+		std::cin.ignore();
+		std::cin.get();
 		return 1;
 	}
 
-	// ŒÚÍ˚‚‡ÂÏ ÔÓˆÂÒÒ ÒÓ ‚ÒÂÏË Ô‡‚‡ÏË
+	std::cout << " –û—Ç–∫—Ä—ã–≤–∞—é –ø—Ä–æ—Ü–µ—Å—Å... (2/6)" << std::endl << std::endl;
+
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 
 	if (!hProcess) {
-		std::cout << "ÕÂ Û‰‡ÎÓÒ¸ ÓÚÍ˚Ú¸ ÔÓˆÂÒÒ." << std::endl;
+		std::cout << "–ù–µ —É–¥–∞–ª–æ—Å—å –æ—Ç–∫—Ä—ã—Ç—å –ø—Ä–æ—Ü–µ—Å—Å." << std::endl;
+		std::cin.ignore();
+		std::cin.get();
 		return 1;
 	}
 
-	// «‡ÔËÒ˚‚‡ÂÏ ÔÛÚ¸ Í Ì‡¯ÂÈ DLL
-	std::string buffer = "D:\\MyTest\\Test.dll";
-	SIZE_T size = buffer.size() + 1;
+	std::string dllPath;
 
-	// ¬˚‰ÂÎˇÂÏ Ô‡ÏˇÚ¸ ‚ ˜ÛÊÓÏ ÔÓˆÂÒÒÂ
+	std::cout << "–í–≤–µ–¥–∏ –ø—É—Ç—å –¥–æ DLL (–∏—Å–ø–æ–ª—å–∑—É–π / –≤–º–µ—Å—Ç–æ \\) >> ";
+	std::cin.ignore();
+	std::getline(std::cin, dllPath);
+	std::cout << std::endl << std::endl;
+
+	SIZE_T size = dllPath.size() + 1;
+
+	std::cout << " –í—ã–¥–µ–ª—è—é –ø–∞–º—è—Ç—å –≤ –ø—Ä–æ—Ü–µ—Å—Å–µ... (3/6)" << std::endl;
+
 	LPVOID addr = VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-	// œË¯ÂÏ ‰‡ÌÌ˚Â ‚ Ô‡ÏˇÚ¸ ‰Û„Ó„Ó ÔÓˆÂÒÒ‡
-	WriteProcessMemory(hProcess, addr, buffer.c_str(), size, NULL);
+	if (!addr) {
+		std::cout << "–ù–µ —É–¥–∞–ª–æ—Å—å –≤—ã–¥–µ–ª–∏—Ç—å –ø–∞–º—è—Ç—å." << std::endl;
+		CloseHandle(hProcess);
+		std::cin.get();
+		return 1;
+	}
 
-	// Õ‡ıÓ‰ËÏ ‡‰ÂÒ LoadLibraryA
+	std::cout << " –ó–∞–ø–∏—Å—ã–≤–∞—é –ø—É—Ç—å –∫ DLL... (4/6)" << std::endl;
+
+	WriteProcessMemory(hProcess, addr, dllPath.c_str(), size, NULL);
+
+	std::cout << " –ü–æ–ª—É—á–∞—é –∞–¥—Ä–µ—Å LoadLibraryA... (5/6)" << std::endl;
+
 	HMODULE hModule = GetModuleHandleA("kernel32.dll");
 	FARPROC func = GetProcAddress(hModule, "LoadLibraryA");
 
-	// «‡ÔÛÒÍ‡ÂÏ LoadLibraryA Ò ÔÛÚÂÏ DLL
+	std::cout << " –ó–∞–ø—É—Å–∫–∞—é LoadLibraryA... (6/6)" << std::endl << std::endl;
+
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)func, addr, 0, NULL);
 
 	if (!hThread) {
-		std::cout << "ÕÂ Û‰‡ÎÓÒ¸ ÒÓÁ‰‡Ú¸ ÔÓÚÓÍ" << std::endl;
+		std::cout << "–ù–µ —É–¥–∞–ª–æ—Å—å —Å–æ–∑–¥–∞—Ç—å –ø–æ—Ç–æ–∫." << std::endl;
 	}
 	else {
-		std::cout << "DLL ÛÒÔÂ¯ÌÓ Á‡„ÛÊÂÌ‡" << std::endl;
+		std::cout << "DLL —É—Å–ø–µ—à–Ω–æ –∑–∞–≥—Ä—É–∂–µ–Ω–∞!" << std::endl;
 		CloseHandle(hThread);
 	}
 
 	CloseHandle(hProcess);
+
+	std::cout << std::endl << "–ù–∞–∂–º–∏ Enter –¥–ª—è –≤—ã—Ö–æ–¥–∞..." << std::endl;
+	std::cin.get();
 	return 0;
 }
