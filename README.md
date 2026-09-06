@@ -34,3 +34,15 @@ Thanks for understanding!😊
 - Added step-by-step status messages
 - Improved error handling
 - Console wait before exit
+
+## v3.0 Changelog
+- Added two injection modes
+- Mode 1: LoadLibraryA (WinAPI)
+- Mode 2: NTDLLInjection (NT API)
+- Added NTApi.h with NT function declarations
+- Added NTApi.cpp with NT function definitions
+- Added NtOpenProcess
+- Added NtWriteVirtualMemory
+- Added NtCreateThreadEx
+- Added LdrLoadDll
+  
